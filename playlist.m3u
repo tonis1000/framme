@@ -1,5 +1,15 @@
 #EXTM3U
 
+#EXTINF:-1 tvg-id="megatv" tvg-logo="https://example.com/logo.png", Mega TV
+https://embed.vindral.com/?core.channelId=alteregomedia_megatv1_ci_6cc490c7-e5c6-486b-acf0-9bb9c20fa670&core.minBufferTime=2000&player.aspectRatio=16:9
+
+#EXTINF:-1 tvg-id="ert1" tvg-logo="https://i.imgur.com/slE8U5m.png", ERT1
+https://eu5cdn.overotm.com/abr_amd10/ert1/playlist.m3u8
+
+#EXTINF:-1 tvg-id="ert2" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/5/50/%CE%95%CE%A1%CE%A42.png", ERT2
+https://cdn1.smart-tv-data.com/vid/ert-2-hbbtv/playlist.m3u8
+
+
 #EXTINF:-1 tvg-id="ert1" tvg-logo="https://i.imgur.com/slE8U5m.png", ERT1
 https://eu5cdn.overotm.com/abr_amd10/ert1/playlist.m3u8
 
