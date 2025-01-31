@@ -457,25 +457,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-// Funktion zum Setzen des aktuellen Sendernamens und der URL
-function setCurrentChannel(channelName, streamUrl) {
-    const currentChannelName = document.getElementById('current-channel-name');
-    const streamUrlInput = document.getElementById('stream-url');
-    currentChannelName.textContent = channelName; // Nur der Sendername
-    streamUrlInput.value = streamUrl;
-}
-
-// Aktualisierung der Uhrzeit
-function updateClock() {
-    const now = new Date();
-    const tag = now.toLocaleDateString('de-DE', { weekday: 'long' });
-    const datum = now.toLocaleDateString('de-DE');
-    const uhrzeit = now.toLocaleTimeString('de-DE', { hour12: false });
-    document.getElementById('tag').textContent = tag;
-    document.getElementById('datum').textContent = datum;
-    document.getElementById('uhrzeit').textContent = uhrzeit;
-}
-
 // Funktion zum Abspielen eines Streams im Video-Player
 function playStream(streamURL, subtitleURL) {
     const videoPlayer = document.getElementById('video-player');
@@ -490,8 +471,20 @@ function playStream(streamURL, subtitleURL) {
         subtitleTrack.track.mode = 'hidden'; // Untertitel ausblenden
     }
 
-    // HLS.js-Integration
-    if (Hls.isSupported() && streamURL.endsWith('.m3u8')) {
+    // Überprüfen, ob es sich um ein Embed-URL handelt
+    if (streamURL.includes('embed.vindral.com')) {
+        // Embed-URL: Verwende ein iframe
+        videoPlayer.innerHTML = `
+            <iframe 
+                src="${streamURL}" 
+                width="100%" 
+                height="100%" 
+                frameborder="0" 
+                allowfullscreen
+            ></iframe>
+        `;
+    } else if (Hls.isSupported() && streamURL.endsWith('.m3u8')) {
+        // HLS.js-Integration
         const hls = new Hls();
         hls.loadSource(streamURL);
         hls.attachMedia(videoPlayer);
