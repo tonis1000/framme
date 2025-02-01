@@ -293,15 +293,21 @@ async function updateSidebarFromM3U(data) {
         const lines = data.split('\n');
         let currentChannelId = null;
 
-        lines.forEach(line => {
+        lines.forEach((line, index) => {
             if (line.startsWith('#EXTINF')) {
                 const idMatch = line.match(/tvg-id="([^"]+)"/);
                 currentChannelId = idMatch ? idMatch[1] : null;
                 if (currentChannelId && !urls[currentChannelId]) {
                     urls[currentChannelId] = [];
                 }
+            } else if (line.startsWith('#EXTVLCOPT:embed=')) {
+                // Handle #EXTVLCOPT:embed=... line
+                if (currentChannelId) {
+                    urls[currentChannelId].push(line.trim());
+                    currentChannelId = null;
+                }
             } else if (currentChannelId && line.startsWith('http')) {
-                urls[currentChannelId].push(line);
+                urls[currentChannelId].push(line.trim());
                 currentChannelId = null;
             }
         });
@@ -313,7 +319,7 @@ async function updateSidebarFromM3U(data) {
     const lines = data.split('\n');
 
     for (let i = 0; i < lines.length; i++) {
-        if (lines[i].startsWith('#EXTINF')) {
+        if (lines[i].startsWith('#EXTINF') || lines[i].startsWith('#EXTVLCOPT:embed=')) {
             const idMatch = lines[i].match(/tvg-id="([^"]+)"/);
             const channelId = idMatch ? idMatch[1] : null;
             const nameMatch = lines[i].match(/,(.*)$/);
@@ -322,7 +328,12 @@ async function updateSidebarFromM3U(data) {
             const imgMatch = lines[i].match(/tvg-logo="([^"]+)"/);
             const imgURL = imgMatch ? imgMatch[1] : 'default_logo.png';
 
-            const streamURL = lines[i + 1].startsWith('http') ? lines[i + 1].trim() : null;
+            let streamURL = null;
+            if (lines[i + 1].startsWith('http')) {
+                streamURL = lines[i + 1].trim();
+            } else if (lines[i].startsWith('#EXTVLCOPT:embed=')) {
+                streamURL = lines[i].split('=')[1].trim();
+            }
 
             if (streamURL) {
                 try {
@@ -354,6 +365,7 @@ async function updateSidebarFromM3U(data) {
 
     checkStreamStatus();
 }
+
 
 
 
