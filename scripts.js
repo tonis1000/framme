@@ -260,17 +260,28 @@ sidebarList.addEventListener('click', function (event) {
     const channelInfo = event.target.closest('.channel-info');
     if (channelInfo) {
         const channelId = channelInfo.dataset.channelId;
-        const programInfo = getCurrentProgram(channelId);
+        const streamURL = channelInfo.dataset.stream;
+        const embedURL = channelInfo.dataset.embed;
+
+        // Επιλογή του URL για αναπαραγωγή
+        const urlToPlay = embedURL || streamURL;
 
         // Aktualisiert den Player mit der aktuellen Sendung
-        setCurrentChannel(channelInfo.querySelector('.sender-name').textContent, channelInfo.dataset.stream);
-        playStream(channelInfo.dataset.stream);
+        setCurrentChannel(channelInfo.querySelector('.sender-name').textContent, urlToPlay);
+        playStream(urlToPlay);
 
-        // Aktualisiert die Programmbeschreibung
-        updatePlayerDescription(programInfo.title, programInfo.description);
+        // Aktualisiert die Programmbeschreibung (nur für reguläre streams)
+        if (!embedURL) {
+            const programInfo = getCurrentProgram(channelId);
+            updatePlayerDescription(programInfo.title, programInfo.description);
 
-        // Aktualisiert die nächsten Programme
-        updateNextPrograms(channelId);
+            // Aktualisiert die nächsten Programme
+            updateNextPrograms(channelId);
+        } else {
+            // Αν είναι embed URL, απενεργοποιήστε την ενημέρωση του EPG
+            updatePlayerDescription('Live Stream', '');
+            document.getElementById('next-programs').innerHTML = ''; // Καθαρίστε τα επόμενα προγράμματα
+        }
 
         // Zeigt das Logo des ausgewählten Senders an
         const logoContainer = document.getElementById('current-channel-logo');
