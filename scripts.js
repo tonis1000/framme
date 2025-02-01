@@ -457,6 +457,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+// Funktion zum Setzen des aktuellen Sendernamens und der URL
+function setCurrentChannel(channelName, streamUrl) {
+    const currentChannelName = document.getElementById('current-channel-name');
+    const streamUrlInput = document.getElementById('stream-url');
+    currentChannelName.textContent = channelName; // Nur der Sendername
+    streamUrlInput.value = streamUrl;
+}
+
+// Aktualisierung der Uhrzeit
+function updateClock() {
+    const now = new Date();
+    const tag = now.toLocaleDateString('de-DE', { weekday: 'long' });
+    const datum = now.toLocaleDateString('de-DE');
+    const uhrzeit = now.toLocaleTimeString('de-DE', { hour12: false });
+    document.getElementById('tag').textContent = tag;
+    document.getElementById('datum').textContent = datum;
+    document.getElementById('uhrzeit').textContent = uhrzeit;
+}
+
+
 // Funktion zum Abspielen eines Streams im Video-Player
 function playStream(streamURL, subtitleURL) {
     const videoPlayer = document.getElementById('video-player');
@@ -473,7 +493,7 @@ function playStream(streamURL, subtitleURL) {
 
     // Überprüfen, ob es sich um ein Embed-URL handelt
     if (streamURL.includes('embed.vindral.com')) {
-        // Embed-URL: Verwende ein iframe
+        // Embed-URL: Iframe verwenden
         videoPlayer.innerHTML = `
             <iframe 
                 src="${streamURL}" 
@@ -509,7 +529,6 @@ function playStream(streamURL, subtitleURL) {
         console.error('Stream-Format wird vom aktuellen Browser nicht unterstützt.');
     }
 }
-
 
 
 
