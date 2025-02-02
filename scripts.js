@@ -282,78 +282,56 @@ sidebarList.addEventListener('click', function (event) {
 
 
 
-
-// Funktion zum Aktualisieren der Sidebar von einer M3U-Datei
-async function updateSidebarFromM3U(data) {
+function updateSidebarFromM3U(data) {
     const sidebarList = document.getElementById('sidebar-list');
     sidebarList.innerHTML = '';
 
-    const extractStreamURLs = (data) => {
-        const urls = {};
-        const lines = data.split('\n');
-        let currentChannelId = null;
-
-        lines.forEach(line => {
-            if (line.startsWith('#EXTINF')) {
-                const idMatch = line.match(/tvg-id="([^"]+)"/);
-                currentChannelId = idMatch ? idMatch[1] : null;
-                if (currentChannelId && !urls[currentChannelId]) {
-                    urls[currentChannelId] = [];
-                }
-            } else if (currentChannelId && line.startsWith('http')) {
-                urls[currentChannelId].push(line);
-                currentChannelId = null;
-            }
-        });
-
-        return urls;
-    };
-
-    const streamURLs = extractStreamURLs(data);
     const lines = data.split('\n');
+    let currentChannel = {};
 
     for (let i = 0; i < lines.length; i++) {
-        if (lines[i].startsWith('#EXTINF')) {
-            const idMatch = lines[i].match(/tvg-id="([^"]+)"/);
-            const channelId = idMatch ? idMatch[1] : null;
-            const nameMatch = lines[i].match(/,(.*)$/);
-            const name = nameMatch ? nameMatch[1].trim() : 'Unbekannt';
+        const line = lines[i].trim();
 
-            const imgMatch = lines[i].match(/tvg-logo="([^"]+)"/);
-            const imgURL = imgMatch ? imgMatch[1] : 'default_logo.png';
+        if (line.startsWith('#EXTINF')) {
+            // Εξαγωγή πληροφοριών καναλιού
+            const idMatch = line.match(/tvg-id="([^"]+)"/);
+            const logoMatch = line.match(/tvg-logo="([^"]+)"/);
+            const nameMatch = line.match(/,(.*)$/);
 
-            const streamURL = lines[i + 1].startsWith('http') ? lines[i + 1].trim() : null;
+            currentChannel = {
+                id: idMatch ? idMatch[1] : null,
+                logo: logoMatch ? logoMatch[1] : 'default_logo.png',
+                name: nameMatch ? nameMatch[1].trim() : 'Unbekannt',
+                streamURL: null,
+                embedURL: null
+            };
+        } else if (line.startsWith('#EXTVLCOPT:embed=')) {
+            // Εξαγωγή embed URL
+            currentChannel.embedURL = line.split('=')[1];
+        } else if (line.startsWith('http')) {
+            // Εξαγωγή stream URL
+            currentChannel.streamURL = line.trim();
+        }
 
-            if (streamURL) {
-                try {
-                    const programInfo = await getCurrentProgram(channelId);
+        // Προσθήκη καναλιού στη sidebar
+        if (currentChannel.name && (currentChannel.streamURL || currentChannel.embedURL)) {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <div class="channel-info" data-stream="${currentChannel.streamURL || ''}" data-embed="${currentChannel.embedURL || ''}" data-channel-id="${currentChannel.id}">
+                    <div class="logo-container">
+                        <img src="${currentChannel.logo}" alt="${currentChannel.name} Logo">
+                    </div>
+                    <span class="sender-name">${currentChannel.name}</span>
+                </div>
+            `;
+            sidebarList.appendChild(listItem);
 
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `
-                        <div class="channel-info" data-stream="${streamURL}" data-channel-id="${channelId}">
-                            <div class="logo-container">
-                                <img src="${imgURL}" alt="${name} Logo">
-                            </div>
-                            <span class="sender-name">${name}</span>
-                            <span class="epg-channel">
-                                <span>${programInfo.title}</span>
-                                <div class="epg-timeline">
-                                    <div class="epg-past" style="width: ${programInfo.pastPercentage}%"></div>
-                                    <div class="epg-future" style="width: ${programInfo.futurePercentage}%"></div>
-                                </div>
-                            </span>
-                        </div>
-                    `;
-                    sidebarList.appendChild(listItem);
-                } catch (error) {
-                    console.error(`Fehler beim Abrufen der EPG-Daten für Kanal-ID ${channelId}:`, error);
-                }
-            }
+            // Επαναφορά του currentChannel
+            currentChannel = {};
         }
     }
-
-    checkStreamStatus();
 }
+
 
 
 
