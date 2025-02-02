@@ -254,40 +254,30 @@ function updatePlayerDescription(title, description) {
 
 
 
-
-// Event-Handler für den Klick auf einen Sender
+// Im Event-Handler für den Klick auf einen Sender
 const sidebarList = document.getElementById('sidebar-list');
-sidebarList.addEventListener('click', async (event) => { // 🔴 Προσθήκη async
+sidebarList.addEventListener('click', function (event) {
     const channelInfo = event.target.closest('.channel-info');
-    if (!channelInfo) return;
-    
-    const channelId = channelInfo.dataset.channelId;
-    const streamURL = channelInfo.dataset.stream;
-    const isEmbed = channelInfo.dataset.isEmbed === 'true';
-    const channelName = channelInfo.querySelector('.sender-name').textContent;
-    const logoImg = channelInfo.querySelector('.logo-container img').src;
+    if (channelInfo) {
+        const channelId = channelInfo.dataset.channelId;
+        const programInfo = getCurrentProgram(channelId);
 
-    if (streamURL) {
-        setCurrentChannel(channelName, streamURL);
-        playStream(streamURL, isEmbed);
+        // Aktualisiert den Player mit der aktuellen Sendung
+        setCurrentChannel(channelInfo.querySelector('.sender-name').textContent, channelInfo.dataset.stream);
+        playStream(channelInfo.dataset.stream);
 
-        if (!isEmbed) {
-            try {
-                const programInfo = await getCurrentProgram(channelId); // 🔴 Χρήση await
-                updatePlayerDescription(programInfo.title, programInfo.description);
-                updateNextPrograms(channelId);
-            } catch (error) {
-                console.error(`Fehler beim Abrufen der Programmdaten für Kanal ${channelId}:`, error);
-            }
-        } else {
-            updatePlayerDescription('Live Stream', '');
-            document.getElementById('next-programs').innerHTML = '';
-        }
+        // Aktualisiert die Programmbeschreibung
+        updatePlayerDescription(programInfo.title, programInfo.description);
 
-        document.getElementById('current-channel-logo').src = logoImg;
+        // Aktualisiert die nächsten Programme
+        updateNextPrograms(channelId);
+
+        // Zeigt das Logo des ausgewählten Senders an
+        const logoContainer = document.getElementById('current-channel-logo');
+        const logoImg = channelInfo.querySelector('.logo-container img').src;
+        logoContainer.src = logoImg;
     }
 });
-
 
 
 
@@ -303,20 +293,15 @@ async function updateSidebarFromM3U(data) {
         const lines = data.split('\n');
         let currentChannelId = null;
 
-        lines.forEach((line, index) => {
+        lines.forEach(line => {
             if (line.startsWith('#EXTINF')) {
                 const idMatch = line.match(/tvg-id="([^"]+)"/);
                 currentChannelId = idMatch ? idMatch[1] : null;
                 if (currentChannelId && !urls[currentChannelId]) {
                     urls[currentChannelId] = [];
                 }
-            } else if (line.startsWith('#EXTVLCOPT:embed=')) {
-                if (currentChannelId) {
-                    urls[currentChannelId].push(line.split('=')[1].trim());
-                    currentChannelId = null;
-                }
             } else if (currentChannelId && line.startsWith('http')) {
-                urls[currentChannelId].push(line.trim());
+                urls[currentChannelId].push(line);
                 currentChannelId = null;
             }
         });
@@ -337,15 +322,7 @@ async function updateSidebarFromM3U(data) {
             const imgMatch = lines[i].match(/tvg-logo="([^"]+)"/);
             const imgURL = imgMatch ? imgMatch[1] : 'default_logo.png';
 
-            let streamURL = null;
-            let isEmbed = false;
-
-            if (lines[i + 1].startsWith('http')) {
-                streamURL = lines[i + 1].trim();
-            } else if (lines[i + 1].startsWith('#EXTVLCOPT:embed=')) {
-                streamURL = lines[i + 1].split('=')[1].trim();
-                isEmbed = true;
-            }
+            const streamURL = lines[i + 1].startsWith('http') ? lines[i + 1].trim() : null;
 
             if (streamURL) {
                 try {
@@ -353,10 +330,7 @@ async function updateSidebarFromM3U(data) {
 
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
-                        <div class="channel-info" 
-                             data-stream="${streamURL}" 
-                             data-channel-id="${channelId}" 
-                             data-is-embed="${isEmbed}">
+                        <div class="channel-info" data-stream="${streamURL}" data-channel-id="${channelId}">
                             <div class="logo-container">
                                 <img src="${imgURL}" alt="${name} Logo">
                             </div>
@@ -380,8 +354,6 @@ async function updateSidebarFromM3U(data) {
 
     checkStreamStatus();
 }
-
-
 
 
 
@@ -504,53 +476,44 @@ function updateClock() {
     document.getElementById('uhrzeit').textContent = uhrzeit;
 }
 
-
 // Funktion zum Abspielen eines Streams im Video-Player
-function playStream(streamURL, isEmbed, subtitleURL) {
+function playStream(streamURL, subtitleURL) {
     const videoPlayer = document.getElementById('video-player');
     const subtitleTrack = document.getElementById('subtitle-track');
 
-    // Καθαρισμός προηγούμενου περιεχομένου
-    videoPlayer.innerHTML = '';
-
-    // Διαχείριση υπότιτλων
+    // Untertitel-Setup
     if (subtitleURL) {
         subtitleTrack.src = subtitleURL;
-        subtitleTrack.track.mode = 'showing';
+        subtitleTrack.track.mode = 'showing'; // Untertitel anzeigen
     } else {
         subtitleTrack.src = '';
-        subtitleTrack.track.mode = 'hidden';
+        subtitleTrack.track.mode = 'hidden'; // Untertitel ausblenden
     }
 
-    // Αν είναι embed URL
-    if (isEmbed) {
-        videoPlayer.innerHTML = `
-            <iframe 
-                src="${streamURL}" 
-                width="100%" 
-                height="100%" 
-                frameborder="0" 
-                allowfullscreen
-            ></iframe>
-        `;
-    } 
-    // Κανονικά streams (HLS, DASH, MP4, WebM)
-    else if (Hls.isSupported() && streamURL.endsWith('.m3u8')) {
+    // HLS.js-Integration
+    if (Hls.isSupported() && streamURL.endsWith('.m3u8')) {
         const hls = new Hls();
         hls.loadSource(streamURL);
         hls.attachMedia(videoPlayer);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => videoPlayer.play());
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            videoPlayer.play();
+        });
     } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl') && streamURL.endsWith('.m3u8')) {
+        // Direktes HLS für Safari
         videoPlayer.src = streamURL;
-        videoPlayer.addEventListener('loadedmetadata', () => videoPlayer.play());
+        videoPlayer.addEventListener('loadedmetadata', function () {
+            videoPlayer.play();
+        });
     } else if (streamURL.endsWith('.mpd')) {
+        // MPEG-DASH-Streaming mit dash.js
         const dashPlayer = dashjs.MediaPlayer().create();
         dashPlayer.initialize(videoPlayer, streamURL, true);
     } else if (videoPlayer.canPlayType('video/mp4') || videoPlayer.canPlayType('video/webm')) {
+        // Direktes MP4- oder WebM-Streaming
         videoPlayer.src = streamURL;
         videoPlayer.play();
     } else {
-        console.error('Unsupported stream format');
+        console.error('Stream-Format wird vom aktuellen Browser nicht unterstützt.');
     }
 }
 
