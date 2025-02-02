@@ -330,7 +330,7 @@ async function updateSidebarFromM3U(data) {
     const lines = data.split('\n');
 
     for (let i = 0; i < lines.length; i++) {
-        if (lines[i].startsWith('#EXTINF') || lines[i].startsWith('#EXTVLCOPT:embed=')) {
+        if (lines[i].startsWith('#EXTINF')) {
             const idMatch = lines[i].match(/tvg-id="([^"]+)"/);
             const channelId = idMatch ? idMatch[1] : null;
             const nameMatch = lines[i].match(/,(.*)$/);
@@ -340,10 +340,13 @@ async function updateSidebarFromM3U(data) {
             const imgURL = imgMatch ? imgMatch[1] : 'default_logo.png';
 
             let streamURL = null;
+            let isEmbed = false;
+
             if (lines[i + 1].startsWith('http')) {
                 streamURL = lines[i + 1].trim();
-            } else if (lines[i].startsWith('#EXTVLCOPT:embed=')) {
-                streamURL = lines[i].split('=')[1].trim();
+            } else if (lines[i + 1].startsWith('#EXTVLCOPT:embed=')) {
+                streamURL = lines[i + 1].split('=')[1].trim();
+                isEmbed = true;
             }
 
             if (streamURL) {
@@ -352,7 +355,10 @@ async function updateSidebarFromM3U(data) {
 
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
-                        <div class="channel-info" data-stream="${streamURL}" data-channel-id="${channelId}">
+                        <div class="channel-info" 
+                             data-stream="${streamURL}" 
+                             data-channel-id="${channelId}" 
+                             data-is-embed="${isEmbed}">
                             <div class="logo-container">
                                 <img src="${imgURL}" alt="${name} Logo">
                             </div>
