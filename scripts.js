@@ -282,11 +282,10 @@ sidebarList.addEventListener('click', function (event) {
 
 
 
-
 // Funktion zum Aktualisieren der Sidebar von einer M3U-Datei
 async function updateSidebarFromM3U(data) {
     const sidebarList = document.getElementById('sidebar-list');
-    sidebarList.innerHTML = '';
+    sidebarList.innerHTML = ''; // Sidebar zurücksetzen
 
     const extractStreamURLs = (data) => {
         const urls = {};
@@ -294,15 +293,29 @@ async function updateSidebarFromM3U(data) {
         let currentChannelId = null;
 
         lines.forEach(line => {
+            // Extrahiere Channel-ID für Standard-Streams
             if (line.startsWith('#EXTINF')) {
                 const idMatch = line.match(/tvg-id="([^"]+)"/);
                 currentChannelId = idMatch ? idMatch[1] : null;
                 if (currentChannelId && !urls[currentChannelId]) {
                     urls[currentChannelId] = [];
                 }
-            } else if (currentChannelId && line.startsWith('http')) {
+            }
+            // Füge Standard-Stream URLs hinzu
+            else if (currentChannelId && line.startsWith('http') && !line.startsWith('#EXTVLCOPT')) {
                 urls[currentChannelId].push(line);
                 currentChannelId = null;
+            }
+            // Füge #EXTVLCOPT URLs hinzu
+            else if (line.startsWith('#EXTVLCOPT')) {
+                const urlMatch = line.match(/embed=(https:\/\/[^\s]+)/);
+                if (urlMatch && urlMatch[1]) {
+                    const channelId = `vlc-${urls.length + 1}`; // Einzigartige ID für #EXTVLCOPT-Streams
+                    if (!urls[channelId]) {
+                        urls[channelId] = [];
+                    }
+                    urls[channelId].push(urlMatch[1]);
+                }
             }
         });
 
@@ -312,6 +325,7 @@ async function updateSidebarFromM3U(data) {
     const streamURLs = extractStreamURLs(data);
     const lines = data.split('\n');
 
+    // Iteriere über alle Zeilen der M3U-Datei
     for (let i = 0; i < lines.length; i++) {
         if (lines[i].startsWith('#EXTINF')) {
             const idMatch = lines[i].match(/tvg-id="([^"]+)"/);
@@ -322,10 +336,12 @@ async function updateSidebarFromM3U(data) {
             const imgMatch = lines[i].match(/tvg-logo="([^"]+)"/);
             const imgURL = imgMatch ? imgMatch[1] : 'default_logo.png';
 
+            // Suche nach Stream-URL für den aktuellen Kanal
             const streamURL = lines[i + 1].startsWith('http') ? lines[i + 1].trim() : null;
 
             if (streamURL) {
                 try {
+                    // Hole Programm-Infos für den aktuellen Kanal
                     const programInfo = await getCurrentProgram(channelId);
 
                     const listItem = document.createElement('li');
@@ -352,8 +368,10 @@ async function updateSidebarFromM3U(data) {
         }
     }
 
-    checkStreamStatus();
+    checkStreamStatus(); // Überprüfen des Stream-Status (optional, je nach deiner Logik)
 }
+
+
 
 
 
@@ -476,44 +494,71 @@ function updateClock() {
     document.getElementById('uhrzeit').textContent = uhrzeit;
 }
 
-// Funktion zum Abspielen eines Streams im Video-Player
+// Funktion zum Hinzufügen des Autoplay-Parameters zur URL
+function addAutoplayParameter(url) {
+    if (!url.includes('autoplay')) {
+        url += (url.includes('?') ? '&' : '?') + 'autoplay=1';
+    }
+    return url;
+}
+
+
+// Funktion zum Abspielen eines Streams (Video Player oder iframe)
 function playStream(streamURL, subtitleURL) {
     const videoPlayer = document.getElementById('video-player');
+    const iframe = document.getElementById('streamFrame');
     const subtitleTrack = document.getElementById('subtitle-track');
 
-    // Untertitel-Setup
-    if (subtitleURL) {
-        subtitleTrack.src = subtitleURL;
-        subtitleTrack.track.mode = 'showing'; // Untertitel anzeigen
-    } else {
-        subtitleTrack.src = '';
-        subtitleTrack.track.mode = 'hidden'; // Untertitel ausblenden
+    // Wenn es ein iframe-Stream ist, verwenden wir das iframe
+    if (iframe && streamURL) {
+        const autoplayUrl = addAutoplayParameter(streamURL);
+
+        iframe.src = autoplayUrl;
+        iframe.marginHeight = "0";
+        iframe.marginWidth = "0";
+        iframe.name = "iframe_a";
+        iframe.width = "100%";
+        iframe.height = "100%";
+        iframe.frameBorder = "0";
+        iframe.allowFullscreen = true;
     }
 
-    // HLS.js-Integration
-    if (Hls.isSupported() && streamURL.endsWith('.m3u8')) {
-        const hls = new Hls();
-        hls.loadSource(streamURL);
-        hls.attachMedia(videoPlayer);
-        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+    // Wenn es ein Video-Stream ist, verwenden wir den Video-Player
+    if (videoPlayer && streamURL) {
+        // Untertitel-Setup für den Video-Player
+        if (subtitleURL) {
+            subtitleTrack.src = subtitleURL;
+            subtitleTrack.track.mode = 'showing'; // Untertitel anzeigen
+        } else {
+            subtitleTrack.src = '';
+            subtitleTrack.track.mode = 'hidden'; // Untertitel ausblenden
+        }
+
+        // HLS.js-Integration für .m3u8-Streams
+        if (Hls.isSupported() && streamURL.endsWith('.m3u8')) {
+            const hls = new Hls();
+            hls.loadSource(streamURL);
+            hls.attachMedia(videoPlayer);
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                videoPlayer.play();
+            });
+        } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl') && streamURL.endsWith('.m3u8')) {
+            // Direktes HLS für Safari
+            videoPlayer.src = streamURL;
+            videoPlayer.addEventListener('loadedmetadata', function () {
+                videoPlayer.play();
+            });
+        } else if (streamURL.endsWith('.mpd')) {
+            // MPEG-DASH-Streaming mit dash.js
+            const dashPlayer = dashjs.MediaPlayer().create();
+            dashPlayer.initialize(videoPlayer, streamURL, true);
+        } else if (videoPlayer.canPlayType('video/mp4') || videoPlayer.canPlayType('video/webm')) {
+            // Direktes MP4- oder WebM-Streaming
+            videoPlayer.src = streamURL;
             videoPlayer.play();
-        });
-    } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl') && streamURL.endsWith('.m3u8')) {
-        // Direktes HLS für Safari
-        videoPlayer.src = streamURL;
-        videoPlayer.addEventListener('loadedmetadata', function () {
-            videoPlayer.play();
-        });
-    } else if (streamURL.endsWith('.mpd')) {
-        // MPEG-DASH-Streaming mit dash.js
-        const dashPlayer = dashjs.MediaPlayer().create();
-        dashPlayer.initialize(videoPlayer, streamURL, true);
-    } else if (videoPlayer.canPlayType('video/mp4') || videoPlayer.canPlayType('video/webm')) {
-        // Direktes MP4- oder WebM-Streaming
-        videoPlayer.src = streamURL;
-        videoPlayer.play();
-    } else {
-        console.error('Stream-Format wird vom aktuellen Browser nicht unterstützt.');
+        } else {
+            console.error('Stream-Format wird vom aktuellen Browser nicht unterstützt.');
+        }
     }
 }
 
