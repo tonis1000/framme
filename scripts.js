@@ -505,22 +505,24 @@ function updateClock() {
 
 
 // Funktion zum Abspielen eines Streams im Video-Player
-function playStream(streamURL, subtitleURL) {
+function playStream(streamURL, isEmbed, subtitleURL) {
     const videoPlayer = document.getElementById('video-player');
     const subtitleTrack = document.getElementById('subtitle-track');
 
-    // Untertitel-Setup
+    // Clear previous content
+    videoPlayer.innerHTML = '';
+
+    // Subtitles
     if (subtitleURL) {
         subtitleTrack.src = subtitleURL;
-        subtitleTrack.track.mode = 'showing'; // Untertitel anzeigen
+        subtitleTrack.track.mode = 'showing';
     } else {
         subtitleTrack.src = '';
-        subtitleTrack.track.mode = 'hidden'; // Untertitel ausblenden
+        subtitleTrack.track.mode = 'hidden';
     }
 
-    // Überprüfen, ob es sich um ein Embed-URL handelt
-    if (streamURL.includes('embed.vindral.com')) {
-        // Embed-URL: Iframe verwenden
+    // Αν είναι embed URL
+    if (isEmbed) {
         videoPlayer.innerHTML = `
             <iframe 
                 src="${streamURL}" 
@@ -530,30 +532,24 @@ function playStream(streamURL, subtitleURL) {
                 allowfullscreen
             ></iframe>
         `;
-    } else if (Hls.isSupported() && streamURL.endsWith('.m3u8')) {
-        // HLS.js-Integration
+    } 
+    // Regular streams
+    else if (Hls.isSupported() && streamURL.endsWith('.m3u8')) {
         const hls = new Hls();
         hls.loadSource(streamURL);
         hls.attachMedia(videoPlayer);
-        hls.on(Hls.Events.MANIFEST_PARSED, function () {
-            videoPlayer.play();
-        });
+        hls.on(Hls.Events.MANIFEST_PARSED, () => videoPlayer.play());
     } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl') && streamURL.endsWith('.m3u8')) {
-        // Direktes HLS für Safari
         videoPlayer.src = streamURL;
-        videoPlayer.addEventListener('loadedmetadata', function () {
-            videoPlayer.play();
-        });
+        videoPlayer.addEventListener('loadedmetadata', () => videoPlayer.play());
     } else if (streamURL.endsWith('.mpd')) {
-        // MPEG-DASH-Streaming mit dash.js
         const dashPlayer = dashjs.MediaPlayer().create();
         dashPlayer.initialize(videoPlayer, streamURL, true);
     } else if (videoPlayer.canPlayType('video/mp4') || videoPlayer.canPlayType('video/webm')) {
-        // Direktes MP4- oder WebM-Streaming
         videoPlayer.src = streamURL;
         videoPlayer.play();
     } else {
-        console.error('Stream-Format wird vom aktuellen Browser nicht unterstützt.');
+        console.error('Unsupported stream format');
     }
 }
 
