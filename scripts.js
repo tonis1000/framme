@@ -509,10 +509,10 @@ function playStream(streamURL, isEmbed, subtitleURL) {
     const videoPlayer = document.getElementById('video-player');
     const subtitleTrack = document.getElementById('subtitle-track');
 
-    // Clear previous content
+    // Καθαρισμός προηγούμενου περιεχομένου
     videoPlayer.innerHTML = '';
 
-    // Subtitles
+    // Διαχείριση υπότιτλων
     if (subtitleURL) {
         subtitleTrack.src = subtitleURL;
         subtitleTrack.track.mode = 'showing';
@@ -533,7 +533,7 @@ function playStream(streamURL, isEmbed, subtitleURL) {
             ></iframe>
         `;
     } 
-    // Regular streams
+    // Κανονικά streams (HLS, DASH, MP4, WebM)
     else if (Hls.isSupported() && streamURL.endsWith('.m3u8')) {
         const hls = new Hls();
         hls.loadSource(streamURL);
@@ -552,6 +552,7 @@ function playStream(streamURL, isEmbed, subtitleURL) {
         console.error('Unsupported stream format');
     }
 }
+
 
 
 
