@@ -454,6 +454,8 @@ function updateClock() {
     document.getElementById('uhrzeit').textContent = uhrzeit;
 }
 
+
+
 // Funktion zum Abspielen eines Streams im Video-Player
 function playStream(streamURL, subtitleURL) {
     const videoPlayer = document.getElementById('video-player');
@@ -468,8 +470,20 @@ function playStream(streamURL, subtitleURL) {
         subtitleTrack.track.mode = 'hidden'; // Untertitel ausblenden
     }
 
-    // HLS.js-Integration
-    if (Hls.isSupported() && streamURL.endsWith('.m3u8')) {
+    // Überprüfen, ob es sich um ein Embed-URL handelt
+    if (streamURL.includes('embed.vindral.com')) {
+        // Embed-URL: Iframe verwenden
+        videoPlayer.innerHTML = `
+            <iframe 
+                src="${streamURL}" 
+                width="100%" 
+                height="100%" 
+                frameborder="0" 
+                allowfullscreen
+            ></iframe>
+        `;
+    } else if (Hls.isSupported() && streamURL.endsWith('.m3u8')) {
+        // HLS.js-Integration
         const hls = new Hls();
         hls.loadSource(streamURL);
         hls.attachMedia(videoPlayer);
