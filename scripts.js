@@ -256,35 +256,30 @@ function updatePlayerDescription(title, description) {
 
 // Im Event-Handler für den Klick auf einen Sender
 const sidebarList = document.getElementById('sidebar-list');
-sidebarList.addEventListener('click', function (event) {
+sidebarList.addEventListener('click', (event) => {
     const channelInfo = event.target.closest('.channel-info');
-    if (channelInfo) {
-        const channelId = channelInfo.dataset.channelId;
-        const streamURL = channelInfo.dataset.stream;
-        const isEmbed = channelInfo.dataset.isEmbed === 'true'; // 🔴 Νέα παράμετρος
+    if (!channelInfo) return;
+    
+    const channelId = channelInfo.dataset.channelId;
+    const streamURL = channelInfo.dataset.stream;
+    const isEmbed = channelInfo.dataset.isEmbed === 'true';
+    const channelName = channelInfo.querySelector('.sender-name').textContent;
+    const logoImg = channelInfo.querySelector('.logo-container img').src;
 
-        // Επιλογή του URL για αναπαραγωγή
-        const urlToPlay = streamURL;
+    if (streamURL) {
+        setCurrentChannel(channelName, streamURL);
+        playStream(streamURL, isEmbed);
 
-        // Aktualisiert den Player mit der aktuellen Sendung
-        setCurrentChannel(channelInfo.querySelector('.sender-name').textContent, urlToPlay);
-        playStream(urlToPlay, isEmbed); // 🔴 Προσθήκη isEmbed
-
-        // Aktualisiert die Programmbeschreibung (μόνο για κανονικά streams)
-        if (!isEmbed) { // 🔴 Έλεγχος με βάση το isEmbed
+        if (!isEmbed) {
             const programInfo = getCurrentProgram(channelId);
             updatePlayerDescription(programInfo.title, programInfo.description);
             updateNextPrograms(channelId);
         } else {
-            // Αν είναι embed URL
             updatePlayerDescription('Live Stream', '');
             document.getElementById('next-programs').innerHTML = '';
         }
 
-        // Zeigt das Logo des ausgewählten Senders an
-        const logoContainer = document.getElementById('current-channel-logo');
-        const logoImg = channelInfo.querySelector('.logo-container img').src;
-        logoContainer.src = logoImg;
+        document.getElementById('current-channel-logo').src = logoImg;
     }
 });
 
