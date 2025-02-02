@@ -254,9 +254,10 @@ function updatePlayerDescription(title, description) {
 
 
 
-// Im Event-Handler für den Klick auf einen Sender
+
+// Event-Handler für den Klick auf einen Sender
 const sidebarList = document.getElementById('sidebar-list');
-sidebarList.addEventListener('click', (event) => {
+sidebarList.addEventListener('click', async (event) => { // 🔴 Προσθήκη async
     const channelInfo = event.target.closest('.channel-info');
     if (!channelInfo) return;
     
@@ -271,9 +272,13 @@ sidebarList.addEventListener('click', (event) => {
         playStream(streamURL, isEmbed);
 
         if (!isEmbed) {
-            const programInfo = getCurrentProgram(channelId);
-            updatePlayerDescription(programInfo.title, programInfo.description);
-            updateNextPrograms(channelId);
+            try {
+                const programInfo = await getCurrentProgram(channelId); // 🔴 Χρήση await
+                updatePlayerDescription(programInfo.title, programInfo.description);
+                updateNextPrograms(channelId);
+            } catch (error) {
+                console.error(`Fehler beim Abrufen der Programmdaten für Kanal ${channelId}:`, error);
+            }
         } else {
             updatePlayerDescription('Live Stream', '');
             document.getElementById('next-programs').innerHTML = '';
@@ -282,6 +287,7 @@ sidebarList.addEventListener('click', (event) => {
         document.getElementById('current-channel-logo').src = logoImg;
     }
 });
+
 
 
 
