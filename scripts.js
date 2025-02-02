@@ -310,9 +310,8 @@ async function updateSidebarFromM3U(data) {
                     urls[currentChannelId] = [];
                 }
             } else if (line.startsWith('#EXTVLCOPT:embed=')) {
-                // Handle #EXTVLCOPT:embed=... line
                 if (currentChannelId) {
-                    urls[currentChannelId].push(line.trim());
+                    urls[currentChannelId].push(line.split('=')[1].trim());
                     currentChannelId = null;
                 }
             } else if (currentChannelId && line.startsWith('http')) {
@@ -380,6 +379,7 @@ async function updateSidebarFromM3U(data) {
 
     checkStreamStatus();
 }
+
 
 
 
