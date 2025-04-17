@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tonis SmartStream TV</title>
   <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- HLS.js για .m3u8 -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
 
@@ -14,11 +17,13 @@
   </header>
 
   <main>
-    <aside id="sidebar"></aside>
+    <aside id="sidebar">
+      <!-- Τα κανάλια ή οι αγώνες θα φορτωθούν εδώ -->
+    </aside>
 
     <section id="player-container">
       <video id="video-player" controls autoplay></video>
-      <iframe id="iframe-player" style="display: none;" allowfullscreen></iframe>
+      <iframe id="iframe-player" allowfullscreen></iframe>
     </section>
   </main>
 
@@ -26,8 +31,18 @@
     <p>Created by Antonis © 2025</p>
   </footer>
 
-  <!-- JS Modules -->
-  <script type="module" src="player/smartPlayer.js"></script>
+  <!-- Modules -->
+  <script type="module">
+    import { playSmartStream } from "./player/smartPlayer.js";
+
+    // Παράδειγμα: Φόρτωση ενός default καναλιού
+    const defaultStream = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+    playSmartStream(defaultStream, "Test Channel");
+
+    // Προσθήκη click listener όταν χρειαστείς από sidebar
+    window.playSmartStream = playSmartStream; // για χρήση global
+  </script>
+
   <script src="js/sidebar.js"></script>
   <script src="js/sport-loader.js"></script>
   <script src="js/epg.js"></script>
