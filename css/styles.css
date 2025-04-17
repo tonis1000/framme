@@ -1,1 +1,123 @@
+/* ======= ΓΕΝΙΚΑ ======= */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #111;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background-color: #1f1f1f;
+  padding: 10px 20px;
+  text-align: center;
+  border-bottom: 2px solid #444;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.8em;
+}
+
+#current-channel-name {
+  margin-top: 5px;
+  font-size: 1.2em;
+  color: #0f0;
+}
+
+/* ======= LAYOUT ======= */
+main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+#sidebar {
+  width: 260px;
+  background-color: #222;
+  padding: 10px;
+  overflow-y: auto;
+  border-right: 2px solid #333;
+}
+
+#player-container {
+  flex: 1;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  position: relative;
+}
+
+/* ======= PLAYER ======= */
+#video-player, #iframe-player {
+  width: 100%;
+  height: 100%;
+  max-height: 90vh;
+  border: none;
+  border-radius: 10px;
+  background: #000;
+}
+
+#iframe-player {
+  display: none;
+}
+
+/* ======= FOOTER ======= */
+footer {
+  background-color: #1f1f1f;
+  color: #aaa;
+  text-align: center;
+  padding: 10px;
+  font-size: 0.9em;
+  border-top: 1px solid #333;
+}
+
+/* ======= SIDEBAR ENTRIES ======= */
+.channel-entry, .sport-entry {
+  padding: 8px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #333;
+  transition: background 0.2s;
+}
+
+.channel-entry:hover, .sport-entry:hover {
+  background-color: #444;
+}
+
+.live-indicator {
+  color: red;
+  font-weight: bold;
+  margin-right: 6px;
+}
+
+.link-entry {
+  display: block;
+  margin-top: 4px;
+  color: #0f0;
+  font-weight: bold;
+}
+
+/* ======= RESPONSIVE ======= */
+@media screen and (max-width: 768px) {
+  #sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 2px solid #333;
+  }
+
+  main {
+    flex-direction: column;
+  }
+
+  #player-container {
+    height: 60vh;
+  }
+}
 
