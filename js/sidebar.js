@@ -53,3 +53,16 @@ async function loadM3UPlaylist(url) {
     console.error("❌ Σφάλμα στη φόρτωση playlist:", err);
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.toLowerCase();
+      document.querySelectorAll(".channel-entry, .sport-entry").forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(query) ? "block" : "none";
+      });
+    });
+  }
+});
+
