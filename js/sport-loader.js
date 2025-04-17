@@ -1,5 +1,5 @@
 window.addEventListener("DOMContentLoaded", () => {
-  loadSportProgram("playlists/sport-program.txt");
+  loadSportProgram("https://foothubhd.online/program.txt");
 });
 
 async function loadSportProgram(url) {
@@ -29,24 +29,21 @@ async function loadSportProgram(url) {
           const entry = document.createElement("div");
           entry.className = "sport-entry";
 
-          // Αν το ματς είναι live, βάλε 🔴
           const isLive = checkIfLive(time);
           entry.innerHTML = `${isLive ? '<span class="live-indicator">🔴</span>' : ''}${time} ${titleWithTeams}`;
 
-          // Κρυφά links
-          const links = [...line.matchAll(/\[(Link[^\]]+)]/g)].map(m => m[1]);
+          const links = [...line.matchAll(/\[(Link[^\]]+)]\((.*?)\)/g)];
           const linkContainer = document.createElement("div");
           linkContainer.style.display = "none";
 
-          links.forEach(linkName => {
+          links.forEach(([full, label, url]) => {
             const a = document.createElement("a");
             a.href = "#";
             a.className = "link-entry";
-            a.textContent = linkName;
+            a.textContent = label;
             a.addEventListener("click", (e) => {
               e.preventDefault();
-              const streamUrl = extractStreamUrl(line, linkName);
-              window.playSmartStream("iframe:" + streamUrl, titleWithTeams);
+              window.playSmartStream("iframe:" + url, titleWithTeams);
             });
             linkContainer.appendChild(a);
           });
@@ -61,18 +58,12 @@ async function loadSportProgram(url) {
       }
     });
   } catch (err) {
-    console.error("❌ Σφάλμα sport program:", err);
+    console.error("❌ Σφάλμα φόρτωσης sport program:", err);
   }
 }
 
 function isDay(line) {
   return /^[Α-Ωα-ω]+\s\d{1,2}\/\d{1,2}\/\d{4}$/.test(line);
-}
-
-function extractStreamUrl(text, label) {
-  const regex = new RegExp(`\\[${label}]\\((.*?)\\)`);
-  const match = text.match(regex);
-  return match ? match[1] : "";
 }
 
 function checkIfLive(timeStr) {
@@ -82,5 +73,5 @@ function checkIfLive(timeStr) {
   matchTime.setHours(h, m, 0, 0);
 
   const diff = Math.abs(now - matchTime);
-  return diff < 100 * 60 * 1000; // 100 λεπτά κοντά στο live
+  return diff < 100 * 60 * 1000;
 }
