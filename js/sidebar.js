@@ -1,7 +1,29 @@
 window.addEventListener("DOMContentLoaded", () => {
-  loadM3UPlaylist("playlists/playlist.m3u");
+  loadTV();
+  setupViewButtons();
 });
 
+function setupViewButtons() {
+  document.getElementById("tv-view-btn").addEventListener("click", loadTV);
+  document.getElementById("sport-view-btn").addEventListener("click", loadSport);
+}
+
+function loadTV() {
+  clearSidebar();
+  loadM3UPlaylist("playlists/playlist.m3u");
+}
+
+function loadSport() {
+  clearSidebar();
+  loadSportProgram("https://foothubhd.online/program.txt");
+}
+
+function clearSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.innerHTML = "";
+}
+
+// Φορτωτής M3U playlist
 async function loadM3UPlaylist(url) {
   try {
     const res = await fetch(url);
@@ -31,4 +53,3 @@ async function loadM3UPlaylist(url) {
     console.error("❌ Σφάλμα στη φόρτωση playlist:", err);
   }
 }
-
