@@ -77,3 +77,22 @@ function checkIfLive(timeStr) {
   const diff = Math.abs(now - matchTime);
   return diff < 100 * 60 * 1000;
 }
+async function showMatchLogos(title) {
+  const logoData = await fetch("assets/logos/team-logos.json").then(res => res.json());
+  const [teamA, teamB] = title.split(" - ").map(t => t.trim());
+
+  const logoA = logoData[teamA];
+  const logoB = logoData[teamB];
+  const container = document.getElementById("current-channel-name");
+
+  if (logoA && logoB) {
+    container.innerHTML = `
+      <img src="${logoA}" alt="${teamA}" style="height:30px;vertical-align:middle;margin-right:5px;">
+      <strong style="color:white;">VS</strong>
+      <img src="${logoB}" alt="${teamB}" style="height:30px;vertical-align:middle;margin-left:5px;">
+    `;
+  } else {
+    container.textContent = title;
+  }
+}
+
