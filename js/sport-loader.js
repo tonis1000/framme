@@ -43,7 +43,9 @@ async function loadSportProgram(url) {
             a.textContent = label;
             a.addEventListener("click", (e) => {
               e.preventDefault();
-              window.playSmartStream("iframe:" + url, titleWithTeams);
+              showMatchLogos(titleWithTeams);
+window.playSmartStream("iframe:" + url, titleWithTeams);
+
             });
             linkContainer.appendChild(a);
           });
