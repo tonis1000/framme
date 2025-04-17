@@ -1,7 +1,32 @@
 {
-  "ΑΕΚ": "https://upload.wikimedia.org/wikipedia/el/thumb/2/24/Aek_Original.svg/1200px-Aek_Original.svg.png",
-  "ΠΑΟΚ": "https://upload.wikimedia.org/wikipedia/el/thumb/7/7c/PAOK_FC_logo.svg/1200px-PAOK_FC_logo.svg.png",
-  "Ολυμπιακός": "https://upload.wikimedia.org/wikipedia/el/thumb/2/2f/Olympiakos_FC_logo.svg/1200px-Olympiakos_FC_logo.svg.png",
-  "Παναθηναϊκός": "https://upload.wikimedia.org/wikipedia/el/thumb/4/4d/Panathinaikos_old_logo.svg/1200px-Panathinaikos_old_logo.svg.png"
-}
+  "ΑΕΚ": "https://upload.wikimedia.org/wikipedia/el/2/24/Aek_Original.svg",
+  "ΠΑΟΚ": "https://upload.wikimedia.org/wikipedia/el/7/7c/PAOK_FC_logo.svg",
+  "Ολυμπιακός": "https://upload.wikimedia.org/wikipedia/el/2/2f/Olympiakos_FC_logo.svg",
+  "Παναθηναϊκός": "https://upload.wikimedia.org/wikipedia/el/4/4d/Panathinaikos_old_logo.svg",
+  "Άρης": "https://upload.wikimedia.org/wikipedia/el/3/32/Aris_FC_Logo.svg",
+  "Ατρόμητος": "https://upload.wikimedia.org/wikipedia/el/d/d8/Atromitosfc_logo.svg",
+  "Αστέρας Τρίπολης": "https://upload.wikimedia.org/wikipedia/el/2/2a/Asteras_Tripolis_F.C._logo.svg",
+  "Βόλος": "https://upload.wikimedia.org/wikipedia/en/8/88/Npsvolosfc-logo.png",
+  "Ιωνικός": "https://upload.wikimedia.org/wikipedia/el/2/2b/Ionikos_fc_logo.svg",
+  "Λαμία": "https://upload.wikimedia.org/wikipedia/el/3/3d/PAS_Lamia_logo_2022.svg",
+  "Λεβαδειακός": "https://upload.wikimedia.org/wikipedia/el/f/f4/Levadeiakos_fc_logo.svg",
+  "ΠΑΣ Γιάννινα": "https://upload.wikimedia.org/wikipedia/el/f/f5/PAS_Giannina_logo.svg",
 
+  "AEK Athens": "https://upload.wikimedia.org/wikipedia/en/2/24/Aek_Original.svg",
+  "Olympiacos": "https://upload.wikimedia.org/wikipedia/en/2/2f/Olympiakos_FC_logo.svg",
+  "PAOK": "https://upload.wikimedia.org/wikipedia/en/7/7c/PAOK_FC_logo.svg",
+  "Panathinaikos": "https://upload.wikimedia.org/wikipedia/en/4/4d/Panathinaikos_old_logo.svg",
+
+  "Real Madrid": "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+  "Barcelona": "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
+  "Manchester City": "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
+  "Manchester United": "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
+  "Liverpool": "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
+  "Chelsea": "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
+  "Bayern Munich": "https://upload.wikimedia.org/wikipedia/en/1/1f/FC_Bayern_München_logo_%282017%29.svg",
+  "Paris SG": "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg",
+  "Juventus": "https://upload.wikimedia.org/wikipedia/en/3/3d/Juventus_Turin.svg",
+  "AC Milan": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
+  "Inter": "https://upload.wikimedia.org/wikipedia/en/0/05/Inter_Milan.svg",
+  "Ajax": "https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg"
+}
