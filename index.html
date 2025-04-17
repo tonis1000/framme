@@ -8,15 +8,22 @@
 
   <!-- HLS.js για .m3u8 -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <!-- Clappr Fallback -->
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
 </head>
 <body>
 
   <header>
     <h1>📺 Tonis SmartStream</h1>
+
     <div id="view-buttons">
-  <button id="tv-view-btn">📺 TV View</button>
-  <button id="sport-view-btn">⚽ Sport View</button>
-</div>
+      <button id="tv-view-btn">📺 TV View</button>
+      <button id="sport-view-btn">⚽ Sport View</button>
+    </div>
+
+    <div id="search-container">
+      <input type="text" id="search-input" placeholder="🔍 Αναζήτηση...">
+    </div>
 
     <div id="current-channel-name">Καλώς ήρθες!</div>
   </header>
@@ -36,16 +43,16 @@
     <p>Created by Antonis © 2025</p>
   </footer>
 
-  <!-- Modules -->
+  <!-- JS Modules -->
   <script type="module">
     import { playSmartStream } from "./player/smartPlayer.js";
 
-    // Παράδειγμα: Φόρτωση ενός default καναλιού
+    // Παράδειγμα: Φόρτωση default stream
     const defaultStream = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
     playSmartStream(defaultStream, "Test Channel");
 
-    // Προσθήκη click listener όταν χρειαστείς από sidebar
-    window.playSmartStream = playSmartStream; // για χρήση global
+    // Global χρήση
+    window.playSmartStream = playSmartStream;
   </script>
 
   <script src="js/sidebar.js"></script>
