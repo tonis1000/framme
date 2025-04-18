@@ -2,21 +2,25 @@ import { getWorkingProxy } from "./proxy-handler.js";
 import { playWithHLS } from "./hls-handler.js";
 import { playIframe } from "./iframe-handler.js";
 import { playWithClappr } from "./clappr-handler.js";
+import { showEPGFor } from "./epg.js";
 
 const videoPlayer = document.getElementById("video-player");
 const iframePlayer = document.getElementById("iframe-player");
 const channelNameEl = document.getElementById("current-channel-name");
 
-export async function playSmartStream(originalUrl, label = "Unknown Channel") {
+export async function playSmartStream(originalUrl, label = "Κανάλι", epgId = null) {
   const type = detectStreamType(originalUrl);
   const proxyURL = await getWorkingProxy(originalUrl);
   const url = proxyURL || originalUrl;
 
-  // Εμφάνιση τίτλου
-  if (channelNameEl) channelNameEl.textContent = label;
+  // Εμφάνιση τίτλου (θα το αντικατασταθεί αν υπάρχει EPG ή logos)
+  if (channelNameEl) {
+    channelNameEl.innerHTML = `<strong>${label}</strong>`;
+  }
 
-  // Απόκρυψη iframe / Reset
+  // Απόκρυψη iframe, reset video
   iframePlayer.style.display = "none";
+  iframePlayer.src = "";
   videoPlayer.style.display = "block";
   videoPlayer.src = "";
   videoPlayer.pause();
@@ -39,13 +43,16 @@ export async function playSmartStream(originalUrl, label = "Unknown Channel") {
     case "strm":
       fetch(url)
         .then(res => res.text())
-        .then(line => playSmartStream(line.trim(), label));
+        .then(line => playSmartStream(line.trim(), label, epgId));
       break;
 
     default:
       playWithClappr(url);
       break;
   }
+
+  // ➕ Εμφάνιση EPG, αν υπάρχει
+  showEPGFor(epgId || label);
 }
 
 function detectStreamType(url) {
@@ -64,12 +71,3 @@ function playNative(url) {
   videoPlayer.src = url;
   videoPlayer.play();
 }
-
-import { showEPGFor } from "./epg.js";
-
-export async function playSmartStream(originalUrl, label = "Κανάλι", epgId = null) {
-  ...
-  showEPGFor(epgId || label);
-}
-
-
