@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>M3U Generator</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    input, textarea, button {
+      font-size: 1em;
+      padding: 6px;
+      margin: 6px 0;
+      width: 100%;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      background-color: #0f0;
+      color: #000;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    textarea {
+      height: 200px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📺 Δημιουργία playlist.m3u</h2>
+
+  <label>Όνομα Καναλιού:</label>
+  <input type="text" id="channelName" placeholder="π.χ. ERT1" />
+
+  <label>URL Stream (π.χ. iframe ή m3u8):</label>
+  <input type="text" id="channelURL" placeholder="π.χ. https://example.com/stream.m3u8 ή iframe:https://..."/>
+
+  <button onclick="addChannel()">➕ Προσθήκη</button>
+
+  <h3>📄 Περιεχόμενο .m3u:</h3>
+  <textarea id="output" readonly>#EXTM3U</textarea>
+
+  <button onclick="copyToClipboard()">📋 Αντιγραφή</button>
+  <button onclick="downloadM3U()">💾 Λήψη αρχείου</button>
+
+  <script>
+    function addChannel() {
+      const name = document.getElementById("channelName").value.trim();
+      const url = document.getElementById("channelURL").value.trim();
+      if (!name || !url) return alert("Συμπλήρωσε και τα δύο πεδία.");
+
+      const entry = `#EXTINF:-1 tvg-name="${name}",${name}\n${url}`;
+      const output = document.getElementById("output");
+      output.value += "\n" + entry;
+
+      document.getElementById("channelName").value = "";
+      document.getElementById("channelURL").value = "";
+    }
+
+    function copyToClipboard() {
+      const textarea = document.getElementById("output");
+      textarea.select();
+      document.execCommand("copy");
+      alert("Αντιγράφηκε!");
+    }
+
+    function downloadM3U() {
+      const text = document.getElementById("output").value;
+      const blob = new Blob([text], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "playlist.m3u";
+      a.click();
+    }
+  </script>
+
+</body>
+</html>
