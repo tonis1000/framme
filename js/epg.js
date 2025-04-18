@@ -1,7 +1,8 @@
 let epgData = [];
 
 window.addEventListener("DOMContentLoaded", () => {
-  fetchEPG("https://iptv-org.github.io/epg/greece.xml");
+  fetchEPG("https://iptv-org.github.io/epg/guides/gr.xml");
+
 });
 
 async function fetchEPG(xmlUrl) {
