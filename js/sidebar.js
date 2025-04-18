@@ -23,7 +23,6 @@ function clearSidebar() {
   sidebar.innerHTML = "";
 }
 
-// Φορτωτής M3U playlist
 async function loadM3UPlaylist(url) {
   try {
     const res = await fetch(url);
@@ -31,20 +30,26 @@ async function loadM3UPlaylist(url) {
     const lines = text.split("\n");
 
     let channelName = "";
+    let tvgId = "";
     const sidebar = document.getElementById("sidebar");
 
-    lines.forEach((line) => {
+    lines.forEach((line, index) => {
       line = line.trim();
+
       if (line.startsWith("#EXTINF")) {
-        const match = line.match(/tvg-name="(.*?)"/);
-        channelName = match ? match[1] : "Άγνωστο Κανάλι";
+        const nameMatch = line.match(/tvg-name="([^"]+)"/);
+        const idMatch = line.match(/tvg-id="([^"]+)"/);
+
+        channelName = nameMatch ? nameMatch[1] : "Άγνωστο Κανάλι";
+        tvgId = idMatch ? idMatch[1] : null;
+
       } else if (line && !line.startsWith("#")) {
         const streamURL = line;
         const entry = document.createElement("div");
         entry.className = "channel-entry";
         entry.textContent = channelName;
         entry.addEventListener("click", () => {
-          window.playSmartStream(streamURL, channelName);
+          window.playSmartStream(streamURL, channelName, tvgId);
         });
         sidebar.appendChild(entry);
       }
@@ -53,6 +58,7 @@ async function loadM3UPlaylist(url) {
     console.error("❌ Σφάλμα στη φόρτωση playlist:", err);
   }
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("search-input");
