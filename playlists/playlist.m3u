@@ -1,5 +1,34 @@
 #EXTM3U
 
+#EXTM3U
+
+#EXTINF:-1 tvg-id="ERT1.gr" tvg-name="ERT1",ERT1
+iframe:https://www.anacon.org/app/chans/gr/ert1s2.php?autoplay=1
+
+#EXTINF:-1 tvg-id="ERT2.gr" tvg-name="ERT2",ERT2
+iframe:https://www.anacon.org/app/chans/gr/ert2s2.php?autoplay=1
+
+#EXTINF:-1 tvg-id="ERT3.gr" tvg-name="ERT3",ERT3
+iframe:https://www.anacon.org/app/chans/gr/ert3s2.php?autoplay=1
+
+#EXTINF:-1 tvg-id="SKAI.gr" tvg-name="SKAI",SKAI
+https://skai-live-stream.m3u8
+
+#EXTINF:-1 tvg-id="MEGA.gr" tvg-name="MEGA",MEGA
+https://megatvlive.streamcdn.to/mega/tracks-v1a1/mono.m3u8
+
+#EXTINF:-1 tvg-id="ANT1.gr" tvg-name="ANT1",ANT1
+https://antenna-live.streamcdn.to/ant1/tracks-v1a1/mono.m3u8
+
+#EXTINF:-1 tvg-id="ALPHA.gr" tvg-name="ALPHA",ALPHA
+https://alphatvlive.streamcdn.to/alpha/tracks-v1a1/mono.m3u8
+
+#EXTINF:-1 tvg-id="OPENBEYOND.gr" tvg-name="OPEN",OPEN
+https://streamcdn.to/open/tracks-v1a1/mono.m3u8
+
+
+
+
 #EXTINF:-1 tvg-id="megatv_vindral" tvg-logo="https://example.com/logo.png", Mega TV (Vindral)
 #EXTVLCOPT:embed=https://embed.vindral.com/?core.channelId=alteregomedia_megatv1_ci_6cc490c7-e5c6-486b-acf0-9bb9c20fa670&core.minBufferTime=2000&player.aspectRatio=16:9
 
