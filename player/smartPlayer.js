@@ -64,7 +64,12 @@ function playNative(url) {
   videoPlayer.src = url;
   videoPlayer.play();
 }
+
 import { showEPGFor } from "./epg.js";
-...
-showEPGFor(label);
+
+export async function playSmartStream(originalUrl, label = "Κανάλι", epgId = null) {
+  ...
+  showEPGFor(epgId || label);
+}
+
 
